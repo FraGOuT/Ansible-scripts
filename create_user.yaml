@@ -1,0 +1,58 @@
+---
+
+
+- hosts: vagrantboxes
+  become: true
+  become_user: root
+  tasks:
+  - name: Create a Dummy user
+    user:
+      name: dummy2
+      password: '$6$PjzKuh3CPMOsW81E$4RkO3BpaqMN2cnTLKvf6JgbGjkYFCB7SQZ2Kvkawqj6qkNN8UmHpXx32EclI4JdzA0WZl32dGVbUHiI0AslXl/'
+      state: present
+    tags: create_dummy2
+
+  - name: Create a Sudo User heman
+    user:
+      name: heman
+      password: '$6$FOmBbRSZ4wfSGA..$i6E7lOwc8tTDYKPg5gbaUO07wk3QDDCVg/zCfGo9pH2W7tweDgDFfyz.zbjNisy8IN9mKFYT1Jo7KMBYx3Ed20'
+      state: present
+      groups: wheel
+      append: yes
+    tags: create_heman
+
+  - name: Delete Dummy2 user
+    user:
+      name: dummy2
+      state: absent
+      remove: yes
+    tags: delete_dummy2
+
+  - name: Create user dummy2
+    user:
+      name: dummy2
+      password: '$6$PjzKuh3CPMOsW81E$4RkO3BpaqMN2cnTLKvf6JgbGjkYFCB7SQZ2Kvkawqj6qkNN8UmHpXx32EclI4JdzA0WZl32dGVbUHiI0AslXl/'
+      state: present
+    tags: create_dummy2
+
+
+  - name: Add SSH key to user dummy2
+    authorized_key:
+      user: dummy2
+      state: present
+      key: "{{ lookup('file', '/Users/himanshu/.ssh/id_rsa.pub') }}"
+    tags: add_key_dummy2
+
+  - name: Remove the SSH key from the user app
+    authorized_key:
+      user: app
+      state: absent
+      key: "{{ lookup('file', '/Users/himanshu/.ssh/id_rsa.pub') }}"
+    tags: remove_key_app
+
+  - name: Delete user heman
+    user:
+      name: heman
+      state: absent
+      remove: yes
+    tags: delete_heman
