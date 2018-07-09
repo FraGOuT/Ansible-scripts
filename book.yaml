@@ -1,0 +1,55 @@
+---
+
+
+- hosts: vagrantboxes
+  become: true
+  become_user: root
+  tasks:
+
+  - name: disable ssh key auth
+    lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: ^PasswordAuthentication
+      line: PasswordAuthentication no
+    tags: disable_password_dummy2
+    notify:
+      restart ssh
+
+  - name: Create a group sudoppl
+    group:
+      name: sudoppl
+      state: present
+    tags: create_group
+
+
+  - name: Make group sudoppl sudo
+    lineinfile:
+      dest: /etc/sudoers
+      regexp: '^wheel(\s+)ALL=(ALL)(\s+)ALL'
+      insertafter: '^wheel'
+      line: '%sudoppl ALL=(ALL) NOPASSWD: ALL'
+      state: present
+      backup: yes
+      validate: '/usr/sbin/visudo -cf %s'
+    tags: make_sudoppl_sudo
+
+
+  - name: Add user into sudoppl
+    user:
+      name: dummy2
+      state: present
+      group: sudoppl
+    tags: add_dummy2_to_sudoppl
+
+  - name: Create a user with no password
+    user:
+      name: nopass
+      state: present
+    tags: nopass_create
+
+
+  handlers:
+  - name: restart ssh
+    service:
+      name: sshd
+      state: restarted

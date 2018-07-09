@@ -36,12 +36,12 @@
     tags: create_dummy2
 
 
-  - name: Add SSH key to user dummy2
+  - name: Add SSH key to user heman
     authorized_key:
-      user: dummy2
+      user: heman
       state: present
       key: "{{ lookup('file', '/Users/himanshu/.ssh/id_rsa.pub') }}"
-    tags: add_key_dummy2
+    tags: add_key_heman
 
   - name: Remove the SSH key from the user app
     authorized_key:
